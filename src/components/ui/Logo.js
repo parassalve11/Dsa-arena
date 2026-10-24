@@ -13,7 +13,7 @@ export function Logo({ href = "/", compact = false }) {
   return (
     <Link href={href} className="flex shrink-0 items-center gap-2 rounded-md px-1 font-semibold tracking-tight text-text hover:opacity-90">
       <LogoMark />
-      {!compact && <span className="text-[1.05rem]">DSA Arena</span>}
+      {!compact && <span className="hidden text-[1.05rem] sm:inline">DSA Arena</span>}
     </Link>
   );
 }

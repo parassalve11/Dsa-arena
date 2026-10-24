@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ALargeSmall, LogOut, User } from "lucide-react";
 import { setSettings, useSettings } from "@/lib/storage";
+import { useHydrated } from "@/lib/useMediaQuery";
 
 const SIZES = [
   { id: "compact", label: "Small" },
@@ -17,6 +18,7 @@ export function UserMenu() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(cachedUser);
   const settings = useSettings();
+  const hydrated = useHydrated();
   const ref = useRef(null);
   const router = useRouter();
 
@@ -47,10 +49,10 @@ export function UserMenu() {
     };
   }, [open]);
 
-  function setTextSize(id) {
-    setSettings({ textSize: id });
-    document.documentElement.dataset.text = id;
-  }
+  // Skip the hydration pass, which still sees the default settings.
+  useEffect(() => {
+    if (hydrated) document.documentElement.dataset.text = settings.textSize;
+  }, [hydrated, settings.textSize]);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
@@ -88,7 +90,7 @@ export function UserMenu() {
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => setTextSize(s.id)}
+                  onClick={() => setSettings({ textSize: s.id })}
                   className={`rounded px-2 py-1 text-[0.82rem] ${
                     settings.textSize === s.id ? "bg-accent text-white" : "text-muted hover:text-text"
                   }`}

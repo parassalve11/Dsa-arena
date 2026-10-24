@@ -3,6 +3,11 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
+  {
+    // Problem files export a plain data object.
+    files: ["src/data/problems/**/*.js"],
+    rules: { "import/no-anonymous-default-export": "off" },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

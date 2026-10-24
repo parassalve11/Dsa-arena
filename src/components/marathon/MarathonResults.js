@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, Hourglass, RotateCcw, Trophy } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
@@ -10,6 +9,7 @@ import { bySlug } from "@/data/catalog";
 import { summary } from "@/lib/marathon";
 import { useMarathons } from "@/lib/storage";
 import { formatClock } from "@/lib/format";
+import { useHydrated } from "@/lib/useMediaQuery";
 
 const REASON = {
   completed: "You solved every question.",
@@ -19,8 +19,7 @@ const REASON = {
 
 export function MarathonResults({ id }) {
   const list = useMarathons();
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => setHydrated(true), []);
+  const hydrated = useHydrated();
   const m = list.find((x) => x.id === id);
 
   if (!hydrated) return <AppHeader />;

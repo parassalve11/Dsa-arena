@@ -17,9 +17,9 @@ export function AppHeader({ children }) {
   const active = useActiveMarathon();
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-bg/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-2 px-4 sm:gap-3 sm:px-6">
         <Logo />
-        <nav className="ml-2 flex items-center gap-1">
+        <nav className="flex items-center gap-1 sm:ml-2">
           {NAV.map((n) => {
             const on = n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
             const Icon = n.icon;

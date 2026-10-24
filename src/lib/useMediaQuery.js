@@ -13,3 +13,10 @@ export function useMediaQuery(query, serverValue = true) {
     () => serverValue
   );
 }
+
+const noopSubscribe = () => () => {};
+
+/** False during server render and hydration, true afterwards. */
+export function useHydrated() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}

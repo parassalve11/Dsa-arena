@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Flag, Hourglass } from "lucide-react";
@@ -9,7 +9,8 @@ import { ConfirmDialog } from "@/components/ui/Dialog";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { bySlug } from "@/data/catalog";
 import { finishMarathon, recordAttempt, recordSolved } from "@/lib/marathon";
-import { useActiveMarathon } from "@/lib/storage";
+import { getActiveMarathon, useActiveMarathon } from "@/lib/storage";
+import { useHydrated } from "@/lib/useMediaQuery";
 import { formatClock } from "@/lib/format";
 
 function Countdown({ endsAt, onExpire }) {
@@ -57,10 +58,18 @@ function QuestionPills({ questions, current }) {
 export function MarathonPlay({ slug }) {
   const router = useRouter();
   const active = useActiveMarathon();
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useHydrated();
   const [confirmEnd, setConfirmEnd] = useState(false);
+  // Set once the marathon ends here (time up, all solved, or ended early).
+  const [finishedId, setFinishedId] = useState(null);
 
-  useEffect(() => setHydrated(true), []);
+  const goToResults = useCallback(
+    (id, delay = 0) => {
+      setFinishedId(id);
+      setTimeout(() => router.replace(`/marathon/results/${id}`), delay);
+    },
+    [router]
+  );
 
   const inMarathon = active && !active.finishedAt && active.questions.some((q) => q.slug === slug);
 
@@ -81,30 +90,19 @@ export function MarathonPlay({ slug }) {
       nextHref: i < qs.length - 1 ? `/marathon/play/${qs[i + 1].slug}` : null,
       statusOf,
       onAttempt: recordAttempt,
-      onSolved: recordSolved,
+      onSolved: (s) => {
+        recordSolved(s);
+        // Solving the last question finishes the marathon: let the confetti play first.
+        if (!getActiveMarathon()) goToResults(active.id, 1500);
+      },
       onNext: nextUnsolved ? () => router.push(`/marathon/play/${nextUnsolved.slug}`) : null,
     };
-  }, [inMarathon, active, slug, router]);
-
-  // Finished (time up, all solved, or ended) -> results page.
-  const [finishedId, setFinishedId] = useState(null);
-  const [lastId, setLastId] = useState(null);
-  useEffect(() => {
-    if (active && !active.finishedAt) setLastId(active.id);
-    else if (lastId && !finishedId) {
-      // Solving the last question finishes the marathon: let the confetti play first.
-      const t = setTimeout(() => setFinishedId(lastId), 1500);
-      return () => clearTimeout(t);
-    }
-  }, [active, lastId, finishedId]);
-  useEffect(() => {
-    if (finishedId) router.replace(`/marathon/results/${finishedId}`);
-  }, [finishedId, router]);
+  }, [inMarathon, active, slug, router, goToResults]);
 
   if (!hydrated) return <WorkspaceSkeleton />;
 
   if (!inMarathon) {
-    if (finishedId || lastId) {
+    if (finishedId) {
       return (
         <div className="flex h-screen flex-col items-center justify-center gap-2 text-center">
           <Hourglass className="h-8 w-8 text-accent-soft" />
@@ -136,7 +134,7 @@ export function MarathonPlay({ slug }) {
 
   const expire = () => {
     const m = finishMarathon("time");
-    if (m) setFinishedId(m.id);
+    if (m) goToResults(m.id);
   };
 
   const full = {
@@ -175,7 +173,7 @@ export function MarathonPlay({ slug }) {
         onConfirm={() => {
           setConfirmEnd(false);
           const m = finishMarathon("ended");
-          if (m) setFinishedId(m.id);
+          if (m) goToResults(m.id);
         }}
       />
     </>

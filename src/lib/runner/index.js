@@ -82,8 +82,22 @@ class Engine {
 
   // Jobs run one at a time. The timer only starts once the runtime is loaded,
   // so the first Pyodide download never counts as a time limit.
+  // If Pyodide reports a fatal failure, the worker is replaced and the job retried once.
   exec(payload, timeoutMs) {
     const job = this.queue.then(async () => {
+      let res = await this.execOnce(payload, timeoutMs);
+      if (res.crash && /fatal/i.test(res.crash)) {
+        this.kill();
+        res = await this.execOnce(payload, timeoutMs);
+      }
+      return res;
+    });
+    this.queue = job.catch(() => {});
+    return job;
+  }
+
+  execOnce(payload, timeoutMs) {
+    return (async () => {
       await this.spawn();
       return new Promise((resolve) => {
         const id = ++this.seq;
@@ -96,9 +110,7 @@ class Engine {
         this.pending.set(id, { resolve, timer });
         this.worker.postMessage({ type: "run", id, prelude: PY_PRELUDE, ...payload });
       });
-    });
-    this.queue = job.catch(() => {});
-    return job;
+    })();
   }
 }
 

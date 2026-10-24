@@ -11,18 +11,20 @@ export function Stopwatch() {
   const [running, setRunning] = useState(false);
   const [base, setBase] = useState(0);
   const [startedAt, setStartedAt] = useState(null);
-  const [, tick] = useState(0);
+  const [now, setNow] = useState(null);
 
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => tick((t) => t + 1), 500);
+    const id = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(id);
   }, [running]);
 
-  const elapsed = base + (running && startedAt ? Date.now() - startedAt : 0);
+  const elapsed = base + (running && startedAt && now ? Math.max(0, now - startedAt) : 0);
 
   function start() {
-    setStartedAt(Date.now());
+    const t = Date.now();
+    setStartedAt(t);
+    setNow(t);
     setRunning(true);
   }
   function pause() {
@@ -30,8 +32,10 @@ export function Stopwatch() {
     setRunning(false);
   }
   function reset() {
+    const t = Date.now();
     setBase(0);
-    setStartedAt(Date.now());
+    setStartedAt(t);
+    setNow(t);
   }
 
   if (!visible) {

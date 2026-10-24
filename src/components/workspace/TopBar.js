@@ -46,34 +46,40 @@ export function TopBar({ onOpenDrawer, prevHref, nextHref, onRandom, onRun, onSu
         <List className="h-[18px] w-[18px]" />
         <span className="hidden md:inline">{drawerLabel}</span>
       </button>
-      <NavIcon href={prevHref} label="Previous problem">
-        <ChevronLeft className="h-5 w-5" />
-      </NavIcon>
-      <NavIcon href={nextHref} label="Next problem">
-        <ChevronRight className="h-5 w-5" />
-      </NavIcon>
-      {onRandom && (
-        <NavIcon onClick={onRandom} label="Random problem">
-          <Shuffle className="h-[18px] w-[18px]" />
+      <div className="hidden items-center sm:flex">
+        <NavIcon href={prevHref} label="Previous problem">
+          <ChevronLeft className="h-5 w-5" />
         </NavIcon>
-      )}
+        <NavIcon href={nextHref} label="Next problem">
+          <ChevronRight className="h-5 w-5" />
+        </NavIcon>
+        {onRandom && (
+          <NavIcon onClick={onRandom} label="Random problem">
+            <Shuffle className="h-[18px] w-[18px]" />
+          </NavIcon>
+        )}
+      </div>
       {left}
 
       <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2 max-lg:static max-lg:ml-auto max-lg:translate-x-0">
         <Tooltip content={<span className="flex items-center gap-1">Run <Kbd>Ctrl</Kbd>+<Kbd>&apos;</Kbd></span>}>
           <Button onClick={onRun} loading={busy === "run"} disabled={!!busy}>
-            {busy !== "run" && <Play className="h-4 w-4" />} Run
+            {busy !== "run" && <Play className="h-4 w-4" />} <span className="hidden min-[480px]:inline">Run</span>
           </Button>
         </Tooltip>
         <Tooltip content={<span className="flex items-center gap-1">Submit <Kbd>Ctrl</Kbd>+<Kbd>Enter</Kbd></span>}>
           <Button variant="primary" onClick={onSubmit} loading={busy === "submit"} disabled={!!busy}>
-            {busy !== "submit" && <CloudUpload className="h-4 w-4" />} Submit
+            {busy !== "submit" && <CloudUpload className="h-4 w-4" />} <span className="hidden min-[480px]:inline">Submit</span>
           </Button>
         </Tooltip>
       </div>
 
       <div className="ml-auto flex items-center gap-1.5 max-lg:ml-2">
-        {right ?? <Stopwatch />}
+        {right ?? (
+          <div className="hidden sm:flex">
+            <Stopwatch />
+          </div>
+        )}
         <UserMenu />
       </div>
     </header>

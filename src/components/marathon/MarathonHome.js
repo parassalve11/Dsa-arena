@@ -63,7 +63,7 @@ function ActiveBanner({ active }) {
   const now = useNow();
   const [confirm, setConfirm] = useState(false);
   const s = summary(active);
-  const left = Math.max(0, (active.endsAt - (now || Date.now())) / 1000);
+  const left = now ? Math.max(0, (active.endsAt - now) / 1000) : active.durationMs / 1000;
   const first = active.questions.find((q) => q.status !== "solved") || active.questions[0];
   return (
     <div className="flex flex-wrap items-center gap-4 rounded-lg border border-medium/30 bg-medium/10 p-5">
