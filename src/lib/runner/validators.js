@@ -27,6 +27,28 @@ export const validators = {
     return nums[i] > left && nums[i] > right;
   },
 
+  // Any correctly completed board that keeps the original clues is accepted.
+  sudoku(input, output) {
+    if (!Array.isArray(output) || output.length !== 9) return false;
+    const rows = Array.from({ length: 9 }, () => new Set());
+    const cols = Array.from({ length: 9 }, () => new Set());
+    const boxes = Array.from({ length: 9 }, () => new Set());
+    for (let i = 0; i < 9; i++) {
+      if (!Array.isArray(output[i]) || output[i].length !== 9) return false;
+      for (let j = 0; j < 9; j++) {
+        const v = output[i][j];
+        if (typeof v !== "string" || !/^[1-9]$/.test(v)) return false;
+        if (input.board[i][j] !== "." && input.board[i][j] !== v) return false;
+        const b = Math.floor(i / 3) * 3 + Math.floor(j / 3);
+        if (rows[i].has(v) || cols[j].has(v) || boxes[b].has(v)) return false;
+        rows[i].add(v);
+        cols[j].add(v);
+        boxes[b].add(v);
+      }
+    }
+    return true;
+  },
+
   // Any palindromic substring of maximum length is accepted.
   longestPalindrome(input, output, expected) {
     if (typeof output !== "string") return false;
