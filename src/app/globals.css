@@ -1,26 +1,223 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0d0f14;
+  --panel: #151821;
+  --panel-2: #1b1f2a;
+  --panel-3: #222736;
+  --border: #262b38;
+  --border-strong: #343a4b;
+  --text: #e6e8ee;
+  --text-soft: #c9cdd8;
+  --muted: #98a0b4;
+  --accent: #6366f1;
+  --accent-hover: #7577f5;
+  --accent-soft: #a5b4fc;
+  --easy: #22c55e;
+  --medium: #f59e0b;
+  --hard: #ef4444;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --w-high: #fb923c;
+  --w-medium: #60a5fa;
+  --w-low: #9ca3af;
+
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-panel-3: var(--panel-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-soft: var(--text-soft);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-easy: var(--easy);
+  --color-medium: var(--medium);
+  --color-hard: var(--hard);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-w-high: var(--w-high);
+  --color-w-medium: var(--w-medium);
+  --color-w-low: var(--w-low);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Reading size. Everything is in rem, so this scales the whole UI. */
+html {
+  font-size: 17px;
+}
+html[data-text="compact"] {
+  font-size: 16px;
+}
+html[data-text="large"] {
+  font-size: 18.5px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #2c3350;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2e3446 transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Problem description typography: roomy and easy on the eyes. */
+.prose-arena {
+  color: var(--text-soft);
+  line-height: 1.75;
+}
+.prose-arena p {
+  margin: 0 0 0.9em;
+}
+.prose-arena strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.prose-arena ul,
+.prose-arena ol {
+  margin: 0 0 0.9em;
+  padding-left: 1.4em;
+}
+.prose-arena ul {
+  list-style: disc;
+}
+.prose-arena ol {
+  list-style: decimal;
+}
+.prose-arena li {
+  margin: 0.25em 0;
+}
+.prose-arena code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--panel-3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.1em 0.38em;
+  color: var(--text);
+}
+.prose-arena pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  overflow-x: auto;
+  margin: 0 0 0.9em;
+}
+.prose-arena pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.prose-arena table {
+  border-collapse: collapse;
+  margin: 0 0 0.9em;
+}
+.prose-arena th,
+.prose-arena td {
+  border: 1px solid var(--border);
+  padding: 0.3em 0.7em;
+}
+
+/* Resizable panel handles */
+.handle {
+  position: relative;
+  flex: none;
+  background: transparent;
+  transition: background 120ms;
+}
+.handle[aria-orientation="vertical"] {
+  width: 8px;
+}
+.handle[aria-orientation="horizontal"] {
+  height: 8px;
+}
+.handle::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: var(--border-strong);
+  transition: background 120ms;
+}
+.handle[aria-orientation="vertical"]::after {
+  top: 50%;
+  left: 3px;
+  width: 2px;
+  height: 28px;
+  transform: translateY(-50%);
+}
+.handle[aria-orientation="horizontal"]::after {
+  left: 50%;
+  top: 3px;
+  height: 2px;
+  width: 28px;
+  transform: translateX(-50%);
+}
+.handle:hover::after,
+.handle[data-separator="active"]::after,
+.handle[data-separator="hover"]::after {
+  background: var(--accent);
+}
+.handle[aria-orientation="vertical"]:hover::after,
+.handle[aria-orientation="vertical"][data-separator="active"]::after {
+  height: 100%;
+}
+.handle[aria-orientation="horizontal"]:hover::after,
+.handle[aria-orientation="horizontal"][data-separator="active"]::after {
+  width: 100%;
+}
+
+@keyframes arena-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-in {
+  animation: arena-fade-in 160ms ease-out;
+}
+
+@keyframes arena-slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.animate-drawer {
+  animation: arena-slide-in 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .animate-drawer {
+    animation: none;
+  }
 }

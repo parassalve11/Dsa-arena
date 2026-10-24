@@ -6,17 +6,31 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "hash-password": "node scripts/hash-password.js",
+    "validate": "node scripts/validate-problems.js",
+    "gen-expected": "node scripts/gen-expected.js",
+    "gen-index": "node scripts/gen-index.js"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "acorn": "^8.19.0",
+    "bcryptjs": "^3.0.3",
+    "canvas-confetti": "^1.9.4",
+    "jose": "^6.2.13",
+    "lucide-react": "^1.61.0",
     "next": "16.4.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "react-markdown": "^10.1.0",
+    "react-resizable-panels": "^4.14.8",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
     "tailwindcss": "^4"
-  }
+  },
+  "type": "module"
 }
