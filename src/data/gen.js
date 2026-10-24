@@ -110,3 +110,88 @@ export function balancedBST(sortedValues) {
   while (nodes.length && nodes[nodes.length - 1] === null) nodes.pop();
   return nodes;
 }
+
+// ---- tree helpers (level-order arrays in, plain values out) ----
+
+function buildNodes(arr) {
+  if (!arr.length || arr[0] === null) return null;
+  const root = { v: arr[0], l: null, r: null };
+  const q = [root];
+  let head = 0;
+  let i = 1;
+  while (head < q.length && i < arr.length) {
+    const node = q[head++];
+    if (i < arr.length && arr[i] !== null) q.push((node.l = { v: arr[i], l: null, r: null }));
+    i++;
+    if (i < arr.length && arr[i] !== null) q.push((node.r = { v: arr[i], l: null, r: null }));
+    i++;
+  }
+  return root;
+}
+
+function toLevel(root) {
+  const out = [];
+  const q = [root];
+  for (let i = 0; i < q.length; i++) {
+    const n = q[i];
+    if (!n) {
+      out.push(null);
+      continue;
+    }
+    out.push(n.v);
+    q.push(n.l, n.r);
+  }
+  while (out.length && out[out.length - 1] === null) out.pop();
+  return out;
+}
+
+/** Random tree shape with distinct values (a shuffled range). */
+export function uniqueTree(n, seed = 1, start = 0) {
+  const shape = randomTree(n, 0, 0, seed);
+  const vals = shuffle(range(n, start), seed + 7);
+  let k = 0;
+  return shape.map((x) => (x === null ? null : vals[k++]));
+}
+
+export function preorderOf(arr) {
+  const out = [];
+  const stack = [buildNodes(arr)];
+  while (stack.length) {
+    const n = stack.pop();
+    if (!n) continue;
+    out.push(n.v);
+    stack.push(n.r, n.l);
+  }
+  return out;
+}
+
+export function inorderOf(arr) {
+  const out = [];
+  const stack = [];
+  let cur = buildNodes(arr);
+  while (cur || stack.length) {
+    while (cur) {
+      stack.push(cur);
+      cur = cur.l;
+    }
+    cur = stack.pop();
+    out.push(cur.v);
+    cur = cur.r;
+  }
+  return out;
+}
+
+/** Tree whose left half mirrors the right: symmetric by construction. */
+export function symmetricTree(halfArr) {
+  const half = buildNodes(halfArr);
+  const mirror = (n) => (n ? { v: n.v, l: mirror(n.r), r: mirror(n.l) } : null);
+  return toLevel({ v: 0, l: half, r: mirror(half) });
+}
+
+/** A chain of n nodes going left (dir = "l") or right. */
+export function chainTree(values, dir = "l") {
+  const out = [values[0]];
+  for (let i = 1; i < values.length; i++) out.push(...(dir === "l" ? [values[i], null] : [null, values[i]]));
+  while (out.length && out[out.length - 1] === null) out.pop();
+  return out;
+}
